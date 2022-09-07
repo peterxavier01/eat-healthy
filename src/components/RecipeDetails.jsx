@@ -25,138 +25,62 @@ const options = {
 const RecipeDetails = () => {
   const { id } = useParams();
 
-  const [recipeDetails, setRecipeDetails] = useState({});
+  // const [recipeDetails, setRecipeDetails] = useState({});
 
-  useEffect(() => {
-    fetchRecipeInfoById();
-  }, []);
+  // useEffect(() => {
+  //   fetchRecipeInfoById();
+  // }, []);
 
-  // const fetchRecipeInfoById = () => {
-  //   const res = axios.get(
-  //     `${BASE_URL}/recipes/${id}/information?includeNutrition=false`,
-  //     options
-  //   );
-  //   return res;
-  // };
-
-  const fetchRecipeInfoById = async () => {
-    const recipeDetailsCheck = JSON.parse(
-      localStorage.getItem("recipeDetails")
+  const fetchRecipeInfoById = () => {
+    const res = axios.get(
+      `${BASE_URL}/recipes/${id}/information?includeNutrition=false`,
+      options
     );
-
-    if (recipeDetailsCheck) {
-      setRecipeDetails(recipeDetailsCheck);
-    } else {
-      const res = await axios.get(
-        `${BASE_URL}/recipes/${id}/information?includeNutrition=false`,
-        options
-      );
-
-      localStorage.setItem("recipeDetails", JSON.stringify(res));
-      setRecipeDetails(res);
-      return res;
-    }
+    return res;
   };
 
-  console.log(recipeDetails);
+  // const fetchRecipeInfoById = async () => {
+  //   const recipeDetailsCheck = JSON.parse(
+  //     localStorage.getItem("recipeDetails")
+  //   );
 
-  // const { data, isLoading, isError } = useQuery(
-  //   ["recipe info"],
-  //   () => fetchRecipeInfoById(),
-  //   {
-  //     keepPreviousData: true,
+  //   if (recipeDetailsCheck) {
+  //     setRecipeDetails(recipeDetailsCheck);
+  //   } else {
+  //     const res = await axios.get(
+  //       `${BASE_URL}/recipes/${id}/information?includeNutrition=false`,
+  //       options
+  //     );
+
+  //     localStorage.setItem("recipeDetails", JSON.stringify(res));
+  //     setRecipeDetails(res);
+  //     return res;
   //   }
-  // );
+  // };
 
-  // if (isLoading) {
-  //   return <h2>Fetching data</h2>;
-  // }
+  const { data, isLoading, isError } = useQuery(
+    ["recipe info"],
+    () => fetchRecipeInfoById(),
+    {
+      keepPreviousData: true,
+    }
+  );
 
-  // if (isError) {
-  //   return <h2>Error fetching data</h2>;
-  // }
+  if (isLoading) {
+    return <h2>Fetching data</h2>;
+  }
+
+  if (isError) {
+    return <h2>Error fetching data</h2>;
+  }
 
   return (
-    // <Grid container spacing={2}>
-    //   <Grid item xs={12} md={5}>
-    //     <Card>
-    //       <CardMedia
-    //         image={data?.data?.image}
-    //         component="img"
-    //         height="400"
-    //         alt="recipe"
-    //       />
-    //     </Card>
-    //   </Grid>
-
-    //   <Grid item xs={12} md={7}>
-    //     <Typography variant="h3" gutterBottom>
-    //       {data?.data?.title}
-    //     </Typography>
-    //     <Typography variant="h6" sx={{ mb: 3 }}>
-    //       Duration:{" "}
-    //       <Box
-    //         component="span"
-    //         sx={{
-    //           backgroundColor: "#068488",
-    //           color: "#fff",
-    //           p: 1,
-    //           borderRadius: "10px",
-    //           border: "none",
-    //           ml: 2,
-    //         }}
-    //       >
-    //         {data?.data?.readyInMinutes} mins
-    //       </Box>
-    //     </Typography>
-
-    //     <Typography variant="h6" gutterBottom>
-    //       Steps for Preparing {data?.data?.title}
-    //     </Typography>
-    //     {data?.data?.analyzedInstructions?.[0]?.steps?.map((step) => (
-    //       <Box
-    //         sx={{
-    //           display: "flex",
-    //           gap: 2,
-    //           mb: 2,
-    //           alignItems: "center",
-    //         }}
-    //       >
-    //         <Box
-    //           component="div"
-    //           sx={{
-    //             p: 2,
-    //             border: `1px solid ${grey[500]}`,
-    //             borderRadius: "100px",
-    //             color: grey[700],
-    //             width: "40px",
-    //             height: "40px",
-    //             display: "flex",
-    //             justifyContent: "center",
-    //             alignItems: "center",
-    //           }}
-    //         >
-    //           {step.number}
-    //         </Box>
-    //         <Typography
-    //           key={step.number}
-    //           variant="subtitle1"
-    //           component="p"
-    //           gutterBottom
-    //         >
-    //           {<Markup content={step.step} />}
-    //         </Typography>
-    //       </Box>
-    //     ))}
-    //   </Grid>
-    // </Grid>
-
     <>
       <Grid container spacing={2}>
         <Grid item xs={12} md={5}>
           <Card>
             <CardMedia
-              image={recipeDetails?.data?.image}
+              image={data?.data?.image}
               component="img"
               height="400"
               alt="recipe"
@@ -166,7 +90,7 @@ const RecipeDetails = () => {
 
         <Grid item xs={12} md={7}>
           <Typography variant="h3" gutterBottom>
-            {recipeDetails?.data?.title}
+            {data?.data?.title}
           </Typography>
           <Typography variant="h6" sx={{ mb: 3 }}>
             <Box
@@ -179,7 +103,7 @@ const RecipeDetails = () => {
                 border: "none",
               }}
             >
-              {recipeDetails?.data?.readyInMinutes} mins
+              {data?.data?.readyInMinutes} mins
             </Box>
           </Typography>
 
@@ -189,50 +113,48 @@ const RecipeDetails = () => {
             color="textSecondary"
             sx={{ mb: 3, lineHeight: "30px" }}
           >
-            {<Markup content={recipeDetails?.data?.summary} />}
+            {<Markup content={data?.data?.summary} />}
           </Typography>
 
           <Typography variant="h6" gutterBottom>
-            Steps for Preparing {recipeDetails?.data?.title}
+            Steps for Preparing {data?.data?.title}
           </Typography>
-          {recipeDetails?.data?.analyzedInstructions?.[0]?.steps?.map(
-            (step) => (
+          {data?.data?.analyzedInstructions?.[0]?.steps?.map((step) => (
+            <Box
+              key={step.number}
+              sx={{
+                display: "flex",
+                gap: 2,
+                mb: 2,
+                alignItems: "start",
+              }}
+            >
               <Box
-                key={step.number}
+                component="div"
                 sx={{
+                  p: 2,
+                  border: `1px solid ${grey[500]}`,
+                  borderRadius: "100px",
+                  color: grey[700],
+                  width: "40px",
+                  height: "40px",
                   display: "flex",
-                  gap: 2,
-                  mb: 2,
-                  alignItems: "start",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                <Box
-                  component="div"
-                  sx={{
-                    p: 2,
-                    border: `1px solid ${grey[500]}`,
-                    borderRadius: "100px",
-                    color: grey[700],
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {step.number}
-                </Box>
-                <Typography
-                  key={step.number}
-                  variant="subtitle1"
-                  component="p"
-                  gutterBottom
-                >
-                  {<Markup content={step.step} />}
-                </Typography>
+                {step.number}
               </Box>
-            )
-          )}
+              <Typography
+                key={step.number}
+                variant="subtitle1"
+                component="p"
+                gutterBottom
+              >
+                {<Markup content={step.step} />}
+              </Typography>
+            </Box>
+          ))}
         </Grid>
       </Grid>
 
@@ -247,7 +169,7 @@ const RecipeDetails = () => {
           gap: 1.2,
         }}
       >
-        {recipeDetails?.data?.extendedIngredients?.map((ingredient) => (
+        {data?.data?.extendedIngredients?.map((ingredient) => (
           <Box key={ingredient.id + Math.random()}>
             <Card>
               <CardContent>

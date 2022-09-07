@@ -12,14 +12,13 @@ import Select from "@mui/material/Select";
 import { BASE_URL } from "../utils/API";
 
 const Recipes = () => {
-  const [number, setNumber] = useState(30);
   const [diet, setDiet] = useState("vegetarian");
   const [mealType, setMealType] = useState("dessert");
 
   const options = {
     url: BASE_URL,
     params: {
-      number: number,
+      number: 30,
       tags: `${diet},${mealType}`,
       apiKey: import.meta.env.VITE_SPOONACULAR_API_KEY,
     },
@@ -33,54 +32,50 @@ const Recipes = () => {
     setMealType(event.target.value);
   };
 
-  const loadMore = () => {
-    setNumber((prev) => prev + 10);
-  };
-
   const truncate = (str, n) => {
     return str?.length > n ? str.substr(0, n - 1) + "..." : str;
   };
 
-  // const fetchRandomRecipes = () => {
-  //   const res = axios.get(`${BASE_URL}/recipes/random`, options);
-  //   return res;
-  // };
-
-  const [recipes, setRecipes] = useState({});
-
-  useEffect(() => {
-    fetchRandomRecipes();
-  }, []);
-
-  const fetchRandomRecipes = async () => {
-    const recipeCheck = JSON.parse(localStorage.getItem("recipes"));
-
-    if (recipeCheck) {
-      setRecipes(recipeCheck);
-    } else {
-      const res = await axios.get(`${BASE_URL}/recipes/random`, options);
-
-      localStorage.setItem("recipes", JSON.stringify(res));
-      setRecipes(res);
-      return res;
-    }
+  const fetchRandomRecipes = () => {
+    const res = axios.get(`${BASE_URL}/recipes/random`, options);
+    return res;
   };
 
-  // const { data, isLoading, isError } = useQuery(
-  //   ["recipes", mealType, diet],
-  //   () => fetchRandomRecipes(),
-  //   {
-  //     keepPreviousData: true,
+  // const [recipes, setRecipes] = useState({});
+
+  // useEffect(() => {
+  //   fetchRandomRecipes();
+  // }, []);
+
+  // const fetchRandomRecipes = async () => {
+  //   const recipeCheck = JSON.parse(localStorage.getItem("recipes"));
+
+  //   if (recipeCheck) {
+  //     setRecipes(recipeCheck);
+  //   } else {
+  //     const res = await axios.get(`${BASE_URL}/recipes/random`, options);
+
+  //     localStorage.setItem("recipes", JSON.stringify(res));
+  //     setRecipes(res);
+  //     return res;
   //   }
-  // );
+  // };
 
-  // if (isLoading) {
-  //   return <h2>Fetching data</h2>;
-  // }
+  const { data, isLoading, isError } = useQuery(
+    ["recipes", mealType, diet],
+    () => fetchRandomRecipes(),
+    {
+      keepPreviousData: true,
+    }
+  );
 
-  // if (isError) {
-  //   return <h2>Error fetching data</h2>;
-  // }
+  if (isLoading) {
+    return <h2>Fetching data</h2>;
+  }
+
+  if (isError) {
+    return <h2>Error fetching data</h2>;
+  }
 
   return (
     <>
@@ -146,17 +141,7 @@ const Recipes = () => {
           justifyItems: "center",
         }}
       >
-        {/* {data?.data?.recipes.map((recipe) => (
-          <RecipeCard
-            key={recipe.id}
-            id={recipe.id}
-            image={recipe.image}
-            title={recipe.title}
-            content={<Markup content={truncate(recipe.summary, 100)} />}
-          />
-        ))} */}
-
-        {recipes?.data?.recipes.map((recipe) => (
+        {data?.data?.recipes.map((recipe) => (
           <RecipeCard
             key={recipe.id}
             id={recipe.id}
@@ -165,6 +150,16 @@ const Recipes = () => {
             content={<Markup content={truncate(recipe.summary, 100)} />}
           />
         ))}
+
+        {/* {recipes?.data?.recipes.map((recipe) => (
+          <RecipeCard
+            key={recipe.id}
+            id={recipe.id}
+            image={recipe.image}
+            title={recipe.title}
+            content={<Markup content={truncate(recipe.summary, 100)} />}
+          />
+        ))} */}
       </Box>
     </>
   );
